@@ -435,11 +435,15 @@ function placePiece(idx, br, bc){
   const { rows, cols, cells } = clearLines(state.run.board);
   const linesCleared = rows.length + cols.length;
   if(linesCleared > 0){
-    // animate
+    /* Remove cleared cells from the board model SYNCHRONOUSLY so the
+       game-over check at the bottom of this function sees the
+       post-clear board. The DOM animation is still deferred below,
+       only the model is updated immediately. */
     cells.forEach(idx=>{
       const r = Math.floor(idx / BOARD_SIZE), c = idx % BOARD_SIZE;
       const cell = cellEls[r][c];
       cell.classList.add("clearing");
+      state.run.board[r][c] = null;
     });
     beep(880 + linesCleared*120, 220, "sawtooth");
     vibrate([20, 30, 20]);
@@ -472,11 +476,8 @@ function placePiece(idx, br, bc){
     setTimeout(()=>{
       // abort if the game was restarted in the meantime
       if(state.run !== runRef) return;
-      // actually remove cells from model
-      cells.forEach(idx=>{
-        const r = Math.floor(idx / BOARD_SIZE), c = idx % BOARD_SIZE;
-        state.run.board[r][c] = null;
-      });
+      // cells were already removed from the model above; just animate
+      // out by re-rendering once the clearing class has played.
       renderBoard();
       // cleaner achievement
       const filled = state.run.board.flat().filter(Boolean).length;
@@ -556,6 +557,11 @@ function endGame(){
   // commit run
   state.stats.games = (state.stats.games||0) + 1;
   state.stats.totalTimeMs = (state.stats.totalTimeMs||0) + (Date.now() - state.run.startedAt);
+  /* Persist this run's score into the cross-run aggregate before the
+     game-over modal is shown. Doing it here (instead of waiting for
+     the modal button handler) prevents the average from being skewed
+     when the user closes the tab mid-modal. */
+  state.stats.totalScoreFromGames = (state.stats.totalScoreFromGames||0) + state.run.score;
   state.stats.totalScore = (state.stats.totalScore||0); // already accumulated
   if(state.run.score > state.stats.best) state.stats.best = state.run.score;
 

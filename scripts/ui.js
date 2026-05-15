@@ -295,14 +295,14 @@ function bindAppEvents() {
   $("#modal-howto").addEventListener("click", e => { if (e.target.id === "modal-howto") $("#modal-howto").classList.remove("show"); });
 
   // game over modal
+  // (endGame already records totalScoreFromGames for us, so the
+  //  buttons here just close the modal and reset the run.)
   $("#m-play-again").addEventListener("click", () => {
-    state.stats.totalScoreFromGames = (state.stats.totalScoreFromGames || 0) + state.run.score;
     $("#modal-gameover").classList.remove("show");
     startGame();
     refreshAllUI();
   });
   $("#m-menu").addEventListener("click", () => {
-    state.stats.totalScoreFromGames = (state.stats.totalScoreFromGames || 0) + state.run.score;
     $("#modal-gameover").classList.remove("show");
     startGame();
     refreshAllUI();
