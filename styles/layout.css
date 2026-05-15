@@ -213,7 +213,6 @@ html[data-device="phone"] .side-col { flex-direction: row; overflow: auto; }
 html[data-device="phone"] .side-tasks-card { display: none; }
 html[data-device="phone"] .hud-strip .chip { padding: 6px 10px; font-size: 11px; }
 html[data-device="phone"] .user-pill .meta { display: none; }
-html[data-device="phone"] .device-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 html[data-device="phone"] .play-card-text .big { font-size: 22px; }
 
 /* RTL adjustments (currently used by Arabic). Mirror back buttons
