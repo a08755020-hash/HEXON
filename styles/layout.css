@@ -163,3 +163,60 @@ html[data-theme="light"] .screen-head {
   .btn-back span { display: none; }
   .btn-back { padding: 9px 11px; }
 }
+
+/* ============================================================
+   Device-profile tweaks
+   The user (or auto-detection) picks one of pc / laptop / tablet
+   / phone. The chosen profile is reflected as html[data-device="..."]
+   which lets us nudge spacing, font sizes and density without
+   relying on viewport width.
+
+   - pc: roomy, biggest type, supports wide play+side layout
+   - laptop: slightly tighter than pc
+   - tablet: friendlier targets, single-column game body
+   - phone: most compact, smaller chips, hides the side column
+   ============================================================ */
+html[data-device="pc"] { font-size: 16px; }
+html[data-device="pc"] .scroll-body { padding: 24px; }
+html[data-device="pc"] .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+html[data-device="pc"] .menu-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+html[data-device="laptop"] { font-size: 15px; }
+html[data-device="laptop"] .scroll-body { padding: 18px; }
+
+html[data-device="tablet"] { font-size: 15px; }
+html[data-device="tablet"] .scroll-body { padding: 16px; }
+html[data-device="tablet"] .grid-4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+html[data-device="tablet"] .menu-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+html[data-device="tablet"] .game-body {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+}
+html[data-device="tablet"] .side-col { flex-direction: row; overflow: auto; }
+html[data-device="tablet"] .side-tasks-card { display: none; }
+html[data-device="tablet"] .btn { padding: 13px 18px; }
+
+html[data-device="phone"] { font-size: 14px; }
+html[data-device="phone"] .scroll-body { padding: 12px; }
+html[data-device="phone"] .grid-3,
+html[data-device="phone"] .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html[data-device="phone"] .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html[data-device="phone"] .screen-head { padding: 10px 12px; gap: 8px; }
+html[data-device="phone"] .head-spacer { display: none; }
+html[data-device="phone"] .game-body {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  padding: 10px;
+  gap: 10px;
+}
+html[data-device="phone"] .side-col { flex-direction: row; overflow: auto; }
+html[data-device="phone"] .side-tasks-card { display: none; }
+html[data-device="phone"] .hud-strip .chip { padding: 6px 10px; font-size: 11px; }
+html[data-device="phone"] .user-pill .meta { display: none; }
+html[data-device="phone"] .device-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html[data-device="phone"] .play-card-text .big { font-size: 22px; }
+
+/* RTL adjustments (currently used by Arabic). Mirror back buttons
+   and other directional icons so the layout reads correctly. */
+html[dir="rtl"] .btn-back .ic-svg { transform: scaleX(-1); }
+html[dir="rtl"] .dropdown__menu { right: auto; left: 0; }

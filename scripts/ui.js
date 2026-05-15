@@ -26,6 +26,39 @@ let loginLangDD = null;
 let setLangDD = null;
 let currentScreen = "menu";
 
+/* ---------- Device profile ---------- */
+const DEVICE_OPTIONS = ["pc", "laptop", "tablet", "phone"];
+
+function detectDevice() {
+  const w = window.innerWidth;
+  const ua = (navigator.userAgent || "").toLowerCase();
+  const touch = matchMedia("(pointer: coarse)").matches;
+  if (/ipad|tablet|playbook|silk/.test(ua) || (touch && w >= 720)) return "tablet";
+  if (/iphone|ipod|android.*mobile|mobile/.test(ua) || (touch && w < 720)) return "phone";
+  if (w >= 1280) return "pc";
+  return "laptop";
+}
+
+function effectiveDevice() {
+  const v = state.settings.device || "auto";
+  return v === "auto" ? detectDevice() : v;
+}
+
+function applyDeviceProfile(device, opts) {
+  const final = device === "auto" ? detectDevice() : device;
+  document.documentElement.setAttribute("data-device", final);
+  document.documentElement.setAttribute("data-device-setting", device);
+  if (opts && opts.toast) {
+    toast(t("toast.device", { device: t("device." + final) }), "info");
+  }
+}
+
+function onResizeMaybeApplyDevice() {
+  if ((state.settings.device || "auto") === "auto") {
+    applyDeviceProfile("auto");
+  }
+}
+
 function init() {
   const persisted = loadState();
   if (persisted) {
@@ -39,6 +72,8 @@ function init() {
   }
   // theme & lang
   document.documentElement.setAttribute("data-theme", state.settings.theme || "dark");
+  applyDeviceProfile(state.settings.device || "auto");
+  window.addEventListener("resize", onResizeMaybeApplyDevice, { passive: true });
 
   // Build login lang dropdown
   loginLangDD = buildLangDropdown($("#login-lang-dropdown"), {
@@ -52,6 +87,11 @@ function init() {
 
   // Apply i18n
   applyI18n();
+
+  // Build the device picker on the login screen. Each chip pins a
+  // layout density; the "remember" toggle controls whether the choice
+  // is restored next time we hit the login screen.
+  setupLoginDevicePicker();
 
   // bind login
   const nickInput = $("#nickname-input");
@@ -82,6 +122,55 @@ function init() {
   } else {
     showLogin();
   }
+}
+
+function setupLoginDevicePicker() {
+  const grid = $("#login-device-grid");
+  if (!grid) return;
+  // If "remember" is OFF we treat the saved device as "auto" for the
+  // purposes of the picker so the user makes a fresh choice each time.
+  const initial = (state.settings.rememberDevice === false) ? "auto" : (state.settings.device || "auto");
+  paintDeviceGrid(grid, initial, (code) => {
+    state.settings.device = code;
+    applyDeviceProfile(code);
+    saveState();
+    paintDeviceGrid(grid, code);
+  });
+  const rememberBtn = $("#login-remember");
+  if (rememberBtn) {
+    const sync = () => rememberBtn.classList.toggle("on", !!state.settings.rememberDevice);
+    sync();
+    rememberBtn.addEventListener("click", () => {
+      state.settings.rememberDevice = !state.settings.rememberDevice;
+      sync();
+      saveState();
+    });
+  }
+}
+
+function paintDeviceGrid(grid, selected, onPick) {
+  const items = [
+    { code: "pc",     i18n: "device.pc",     icon: "i-monitor"   },
+    { code: "laptop", i18n: "device.laptop", icon: "i-laptop"    },
+    { code: "tablet", i18n: "device.tablet", icon: "i-tablet"    },
+    { code: "phone",  i18n: "device.phone",  icon: "i-smartphone" },
+    { code: "auto",   i18n: "login.detect",  icon: "i-bolt"      },
+  ];
+  if (onPick) grid.innerHTML = "";
+  if (onPick || !grid.children.length) {
+    grid.innerHTML = items.map(it => (
+      '<button class="device-card" data-dev="' + it.code + '" type="button">' +
+      '<svg class="ic-svg"><use href="#' + it.icon + '"/></svg>' +
+      '<span data-i18n="' + it.i18n + '">' + t(it.i18n) + '</span>' +
+      '</button>'
+    )).join("");
+    grid.querySelectorAll(".device-card").forEach(btn => {
+      btn.addEventListener("click", () => onPick && onPick(btn.dataset.dev));
+    });
+  }
+  grid.querySelectorAll(".device-card").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.dev === selected);
+  });
 }
 
 function enterApp() {
@@ -241,6 +330,36 @@ function bindAppEvents() {
     saveState();
     location.reload();
   });
+
+  // profile: copy ID — click on the badge OR on the dedicated button
+  const copyId = async () => {
+    const id = state.profile.id || "";
+    if (!id) return;
+    try {
+      await navigator.clipboard.writeText(id);
+    } catch {
+      // Fallback for browsers without async clipboard API.
+      const ta = document.createElement("textarea");
+      ta.value = id; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } finally { ta.remove(); }
+    }
+    toast(t("profile.copied"), "success");
+  };
+  const profCopyBtn = $("#prof-copy");
+  const profIdBadge = $("#prof-id");
+  if (profCopyBtn) profCopyBtn.addEventListener("click", copyId);
+  if (profIdBadge) profIdBadge.addEventListener("click", copyId);
+
+  // settings: device picker
+  const setGrid = $("#set-device-grid");
+  if (setGrid) {
+    paintDeviceGrid(setGrid, state.settings.device || "auto", (code) => {
+      state.settings.device = code;
+      applyDeviceProfile(code, { toast: true });
+      saveState();
+      paintDeviceGrid(setGrid, code);
+    });
+  }
 }
 
 function renderAllText() {

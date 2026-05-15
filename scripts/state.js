@@ -2,7 +2,18 @@
 const state = {
   profile: { nickname:"", id:"", registeredAt:0, lastLoginDay:0, loginDays:[] },
   stats: { games:0, best:0, bestRun:0, totalScore:0, totalTimeMs:0, lines:0, bestCombo:0, placedTotal:0, xp:0 },
-  settings: { lang:"uk", sound:true, vibration:true, theme:"dark" },
+  settings: {
+    lang: "uk",
+    sound: true,
+    vibration: true,
+    theme: "dark",
+    /* "auto" detects from screen width on each launch.
+       "pc" / "laptop" / "tablet" / "phone" pin a specific layout density. */
+    device: "auto",
+    /* When true the chosen device is restored on every future login.
+       When false the user is asked again on the next login screen. */
+    rememberDevice: true,
+  },
   achievements: new Set(), // ids
   hidden: { firstPlace:false, tripleClear:false, quadClear:false, speedrun:false, pacifist:false, survivor:false, cleaner:false },
   dailyTasks: { date:"", tasks:[] },

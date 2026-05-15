@@ -238,12 +238,78 @@
   font-weight: 800; font-size: 30px;
   box-shadow: 0 14px 32px rgba(124, 92, 255, 0.45);
 }
-.profile-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.profile-meta { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
 .profile-meta .nm { font-weight: 800; font-size: 22px; line-height: 1.1; }
 .profile-meta .id {
   color: var(--fg-dim); font-size: 12px;
   font-family: 'JetBrains Mono', monospace;
 }
+.profile-meta .id-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.id-badge {
+  background: var(--card-strong); border: 1px solid var(--border);
+  color: var(--fg); padding: 5px 10px; border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.id-badge:hover { background: var(--card-hi); border-color: var(--border-strong); color: var(--fg); }
+.id-badge:active { transform: translateY(1px); }
+
+/* ---------- Device picker ---------- */
+.device-grid {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+.device-grid.compact { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); max-width: 560px; }
+.device-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px;
+  padding: 12px 8px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--fg-dim); font-weight: 700; font-size: 12px;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease;
+  min-height: 76px;
+}
+.device-card .ic-svg { width: 22px; height: 22px; color: var(--fg-dim); }
+.device-card:hover { background: var(--card-strong); border-color: var(--border-strong); color: var(--fg); }
+.device-card:hover .ic-svg { color: var(--fg); }
+.device-card.on {
+  background: var(--accent-grad-soft);
+  border-color: rgba(124, 92, 255, 0.55);
+  color: var(--fg);
+  box-shadow: 0 8px 22px rgba(124, 92, 255, 0.25);
+}
+.device-card.on .ic-svg { color: var(--accent); }
+
+/* Login-screen device block */
+.login-device {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 12px; border-radius: 16px;
+  background: var(--card); border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.login-device-head { display: flex; flex-direction: column; gap: 2px; }
+.login-device-head .lbl { font-weight: 700; font-size: 13px; }
+.login-device-head .sub { font-size: 11px; color: var(--fg-dim); }
+.login-device-foot { display: flex; align-items: center; gap: 10px; }
+.login-device-foot .lbl { font-size: 12px; font-weight: 600; color: var(--fg-dim); }
+
+/* The settings row can stack its label above the picker so the
+   grid has room on narrow screens. */
+.row-stack {
+  flex-direction: column; align-items: stretch;
+}
+.row-stack > div:first-child { margin-bottom: 10px; }
+
+/* Dropdown menu should scroll once we ship 18 languages. */
+.dropdown__menu { max-height: 280px; overflow-y: auto; scrollbar-width: thin; }
 .level-bar { margin-top: 8px; }
 .level-bar .ft {
   display: flex; justify-content: space-between;

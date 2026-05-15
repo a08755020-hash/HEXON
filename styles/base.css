@@ -121,6 +121,7 @@ input { font: inherit; color: inherit; }
 .btn-ghost { background: transparent; }
 .btn-danger { color: var(--bad); border-color: rgba(255, 100, 112, 0.4); }
 .btn-block { width: 100%; }
+.btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 10px; gap: 6px; }
 
 /* ---------- Icon helpers ---------- */
 .ic-svg {
